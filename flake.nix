@@ -14,7 +14,7 @@ outputs = { self, nixpkgs, flake-utils }:
           allowUnfree = true;
         };
       };
-      androidSdk = pkgs.androidenv.androidPkgs_29_0.androidsdk;
+      androidSdk = pkgs.androidenv.androidPkgs.androidsdk;
     in
     {
       devShell =
