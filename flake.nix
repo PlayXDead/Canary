@@ -20,7 +20,7 @@
       # The 'sdk' function is available directly on the `android` output
       # when the flake is evaluated for the current system.
       myAndroidSdk = android.sdk.${system} (sdkPkgs: with sdkPkgs; [
-        platforms-android-34
+        platforms-android-29
         build-tools-34-0-0
         platform-tools
         cmdline-tools-latest
