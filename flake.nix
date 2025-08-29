@@ -39,6 +39,7 @@
         shellHook = ''
           export ANDROID_HOME=${myAndroidSdk}/share/android-sdk
           export ANDROID_SDK_ROOT=${myAndroidSdk}share/android-sdk
+          export PATH="$PATH:${cmdlineToolsBin}"
           export JAVA_HOME=${pkgs.jdk}
         '';
       };
