@@ -26,6 +26,9 @@
         cmdline-tools-latest
       ]);
 
+      # Define cmdlineToolsBin here so it's visible in the devShells definition
+      cmdlineToolsBin = "${myAndroidSdk}/share/android-sdk/cmdline-tools/latest/bin";
+
     in {
       devShells.default = pkgs.mkShell {
         name = "flutter-dev-shell";
