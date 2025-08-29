@@ -1,0 +1,66 @@
+{
+  description = "Flutter development environment";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; # Using unstable for latest packages
+    flake-utils.url = "github:numtide/flake-utils";
+    android.url = "github:tadfisher/android-nixpkgs"; # Keeping your chosen Android flake
+  };
+
+  outputs = { self, nixpkgs, flake-utils, android, }:
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+        config = {
+          allowUnfree = true;
+          android_sdk.accept_license = true;
+        };
+      };
+
+      # Define the Android SDK components including a specific NDK version
+      # 'platform-tools' is included here and will resolve to the latest stable
+      # version integrated into the 'tadfisher/android-nixpkgs' flake.
+      # Replace 'ndk-26-3-11579264' with the NDK version your project requires
+      # if different. You can find available versions by running:
+      # nix flake show github:tadfisher/android-nixpkgs | grep ndk-
+      myAndroidSdk = android.sdk.${system} (sdkPkgs: with sdkPkgs; [
+      platforms-android-34
+        build-tools-34-0-0
+        platform-tools
+        cmdline-tools-latest
+        ndk-26-3-11579264 # must be explicit ndk-bundle no longer works
+        emulator
+        system-images-android-34-google-apis-playstore-x86-64 # find with nix flake show github:tadfisher/android-nixpkgs | grep system-images
+      ]);
+
+      # Define paths for environment variables
+      # myAndroidSdk already points to the composed SDK root, so its sub-paths are relative to it.
+      cmdlineToolsBin = "${myAndroidSdk}/share/android-sdk/cmdline-tools/latest/bin";
+      androidNdkRoot = "${myAndroidSdk}/share/android-sdk/ndk/26.3.11579264";
+
+    in {
+      devShells.default = pkgs.mkShell {
+        name = "flutter-dev-shell";
+
+        packages = with pkgs; [
+          flutter # Flutter SDK
+          jdk17      # Default JDK from nixpkgs
+          myAndroidSdk # The composed Android SDK and NDK
+        ];
+
+        # Set environment variables required for Android and Flutter development
+        shellHook = ''
+          export ANDROID_HOME=${myAndroidSdk}/share/android-sdk
+          export ANDROID_SDK_ROOT=${myAndroidSdk}/share/android-sdk
+          export ANDROID_NDK_ROOT=${androidNdkRoot}
+          export PATH="$PATH:${cmdlineToolsBin}" # Add cmdline tools to PATH
+          export JAVA_HOME=${pkgs.jdk17}
+
+          echo "Welcome to the Flutter/Android Development Shell!"
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+          echo "ANDROID_NDK_ROOT: $ANDROID_NDK_ROOT"
+        '';
+      };
+    });
+}
+
