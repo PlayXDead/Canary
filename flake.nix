@@ -20,12 +20,12 @@
       # The 'sdk' function is available directly on the `android` output
       # when the flake is evaluated for the current system.
       myAndroidSdk = android.sdk.${system} (sdkPkgs: with sdkPkgs; [
-        platforms-android-29
+        platforms-android-34
         build-tools-34-0-0
         platform-tools
         cmdline-tools-latest
         emulator
-        system-images-android-29-default-x86 # find with nix flake show github:tadfisher/android-nixpkgs | grep system-images
+        system-images-android-34-default-x86 # find with nix flake show github:tadfisher/android-nixpkgs | grep system-images
       ]);
 
       # Define cmdlineToolsBin here so it's visible in the devShells definition
