@@ -40,16 +40,21 @@
             pkgs.zlib
             pkgs.stdenv.cc.cc.lib
             pkgs.rlwrap
+            pkgs.gradle
           ];
 
           shellHook = ''
+            # Android SDK / NDK
             export ANDROID_HOME=${myAndroidSdk}/share/android-sdk
             export ANDROID_SDK_ROOT=$ANDROID_HOME
             export ANDROID_NDK_ROOT=${androidNdkRoot}
             export PATH=$PATH:${cmdlineToolsBin}:${myAndroidSdk}/share/android-sdk/emulator
 
+            # Java
             export JAVA_HOME=${pkgs.jdk17}/lib/openjdk
+            export PATH=$JAVA_HOME/bin:$PATH
 
+            # Gradle
             export GRADLE_USER_HOME=$PWD/.gradle
             mkdir -p $GRADLE_USER_HOME
 
@@ -58,10 +63,11 @@
               -Dorg.gradle.vfs.watch=true \
               -Dorg.gradle.vfs.watch.mode=polling"
 
+            # Minimal reproducible test setup
             mkdir -p "$PWD/etc"
             touch "$PWD/etc/ld-nix.so.preload"
 
-            echo "Flutter/Nix devShell ready!"
+            echo "Flutter + Android devShell ready!"
           '';
         };
       });
